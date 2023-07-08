@@ -74,6 +74,7 @@ pipeline {
         stage('UPLOAD ARTIFACT TO NEXUS') {
                     steps {
                         script {
+                            echo '${env.WORKSPACE}'
                             def warFilePath = "${env.WORKSPACE}/target/vprofile-v2.war"
                             nexusArtifactUploader(
                                 nexusVersion: 'nexus3',
