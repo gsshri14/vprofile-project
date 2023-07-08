@@ -47,7 +47,7 @@ pipeline {
         stage('CHECKSTYLE ANALYSIS') {
 
             steps {
-                sh 'mvn -s settings.xml pwd:pwd'
+                sh 'mvn -B -s settings.xml pmd:pmd'
             }
         }
 
