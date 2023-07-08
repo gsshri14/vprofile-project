@@ -1,10 +1,9 @@
 def COLOR_MAP = [
-    'SUCCESS': 'good',
-    'FAILURE': 'danger',
+    SUCCESS: 'good',
+    FAILURE: 'danger'
 ]
 
 pipeline {
-
     agent any
 
     tools {
@@ -27,13 +26,10 @@ pipeline {
     }
 
     stages {
-
         stage('BUILD') {
-
             steps {
                 sh 'mvn -s settings.xml -DskipTests clean install'
             }
-
             post {
                 success {
                     echo 'Now archiving...'
@@ -43,27 +39,26 @@ pipeline {
         }
 
         stage('TEST') {
-
             steps {
                 sh 'mvn -s settings.xml clean test'
             }
         }
 
-
         stage('SONAR ANALYSIS') {
-
             environment {
                 scannerHome = tool 'sonarscanner'
             }
             steps {
-                withSonarQubeEnv('sonarserver'){
-                    sh '''${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=vprofile \
-                                       -Dsonar.projectName=vprofile-repo \
-                                       -Dsonar.projectVersion=1.0 \
-                                       -Dsonar.sources=src/ \
-                                       -Dsonar.java.binaries=target/test-classes/com/visualpathit/account/controllerTest/ \
-                                       -Dsonar.junit.reportsPath=target/surefire-reports/ \
-                                       -Dsonar.jacoco.reportsPath=target/jacoco.exec '''
+                withSonarQubeEnv('sonarserver') {
+                    sh """
+                    ${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=vprofile \
+                        -Dsonar.projectName=vprofile-repo \
+                        -Dsonar.projectVersion=1.0 \
+                        -Dsonar.sources=src/ \
+                        -Dsonar.java.binaries=target/test-classes/com/visualpathit/account/controllerTest/ \
+                        -Dsonar.junit.reportsPath=target/surefire-reports/ \
+                        -Dsonar.jacoco.reportsPath=target/jacoco.exec
+                    """
                 }
             }
         }
@@ -79,7 +74,7 @@ pipeline {
         stage('UPLOAD ARTIFACT TO NEXUS') {
             steps {
                 script {
-                    echo '${env.WORKSPACE}'
+                    echo env.WORKSPACE
                     def warFilePath = "${env.WORKSPACE}/target/vprofile-v2.war"
                     nexusArtifactUploader(
                         nexusVersion: 'nexus3',
@@ -90,16 +85,17 @@ pipeline {
                         repository: "${RELEASE_REPO}",
                         credentialsId: "${NEXUS_LOGIN}",
                         artifacts: [
-                            [artifactId: 'vprofile',
-                             classifier: '',
-                             file: warFilePath,
-                             type: 'war']
+                            [
+                                artifactId: 'vprofile',
+                                classifier: '',
+                                file: warFilePath,
+                                type: 'war'
+                            ]
                         ]
                     )
                 }
             }
         }
-
     }
 
     post {
@@ -110,5 +106,4 @@ pipeline {
                 message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} \n More info at: ${env.BUILD_URL}"
         }
     }
-
 }
