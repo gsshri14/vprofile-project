@@ -1,3 +1,8 @@
+def COLOR_MAP = [
+    'SUCCESS': 'good',
+    'FAILURE': 'danger',
+]
+
 pipeline {
 
     agent any
@@ -72,30 +77,39 @@ pipeline {
         }
 
         stage('UPLOAD ARTIFACT TO NEXUS') {
-                    steps {
-                        script {
-                            echo '${env.WORKSPACE}'
-                            def warFilePath = "${env.WORKSPACE}/target/vprofile-v2.war"
-                            nexusArtifactUploader(
-                                nexusVersion: 'nexus3',
-                                protocol: 'http',
-                                nexusUrl: "${NEXUSIP}:${NEXUSPORT}",
-                                groupId: 'QA',
-                                version: "${env.BUILD_ID}-${env.BUILD_TIMESTAMP}",
-                                repository: "${RELEASE_REPO}",
-                                credentialsId: "${NEXUS_LOGIN}",
-                                artifacts: [
-                                    [artifactId: 'vprofile',
-                                     classifier: '',
-                                     file: warFilePath,
-                                     type: 'war']
-                                ]
-                            )
-                        }
-                    }
+            steps {
+                script {
+                    echo '${env.WORKSPACE}'
+                    def warFilePath = "${env.WORKSPACE}/target/vprofile-v2.war"
+                    nexusArtifactUploader(
+                        nexusVersion: 'nexus3',
+                        protocol: 'http',
+                        nexusUrl: "${NEXUSIP}:${NEXUSPORT}",
+                        groupId: 'QA',
+                        version: "${env.BUILD_ID}-${env.BUILD_TIMESTAMP}",
+                        repository: "${RELEASE_REPO}",
+                        credentialsId: "${NEXUS_LOGIN}",
+                        artifacts: [
+                            [artifactId: 'vprofile',
+                             classifier: '',
+                             file: warFilePath,
+                             type: 'war']
+                        ]
+                    )
                 }
+            }
+        }
 
+    }
 
+    post {
+        always {
+        echo 'Slack Notification'
+        slackSend channel: '#'
+            color: COLOR_MAP[currentBuild.currentResult],
+            message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER}" \n
+            More info at: ${env.BUILD_URL
+        }
     }
 
 }
