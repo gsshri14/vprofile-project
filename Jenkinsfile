@@ -86,7 +86,7 @@ pipeline {
                                 artifacts: [
                                     [artifactId: 'vprofile',
                                      classifier: '',
-                                     file: warFilePath,
+                                     file: echo '${warFilePath}' warFilePath,
                                      type: 'war']
                                 ]
                             )
