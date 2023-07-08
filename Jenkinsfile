@@ -74,6 +74,7 @@ pipeline {
         stage('UPLOAD ARTIFACT TO NEXUS') {
 
             steps {
+                    def warFilePath = "${env.WORKSPACE}/target/vprofile-v2.war"
                     nexusArtifactUploader(
                         nexusVersion: 'nexus3',
                         protocol: 'http',
@@ -85,7 +86,7 @@ pipeline {
                         artifacts: [
                             [artifactId: 'vproapp',
                              classifier: '',
-                             file: 'lastSuccessfulBuild/target/vprofile-v2.war',
+                             file: warFilePath,
                              type: 'war']
                         ]
                      )
