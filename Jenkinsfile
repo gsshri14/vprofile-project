@@ -38,17 +38,17 @@ pipeline {
         stage('TEST') {
 
             steps {
-                sh 'mvn clean test'
+                sh 'mvn -s settings.xml clean test'
             }
         }
 
         stage('CHECKSTYLE ANALYSIS') {
 
             steps {
-                sh 'mvn checkstyle:checkstyle'
+                sh 'mvn -s settings.xml checkstyle:checkstyle'
             }
         }
-        
+
     }
 
 }
