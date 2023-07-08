@@ -72,26 +72,28 @@ pipeline {
         }
 
         stage('UPLOAD ARTIFACT TO NEXUS') {
+                    steps {
+                        script {
+                            def warFilePath = "${env.WORKSPACE}/target/vprofile-v2.war"
+                            nexusArtifactUploader(
+                                nexusVersion: 'nexus3',
+                                protocol: 'http',
+                                nexusUrl: "${NEXUSIP}:${NEXUSPORT}",
+                                groupId: 'QA',
+                                version: "${env.BUILD_ID}-${env.BUILD_TIMESTAMP}",
+                                repository: "${RELEASE_REPO}",
+                                credentialsId: "${NEXUS_LOGIN}",
+                                artifacts: [
+                                    [artifactId: 'vproapp',
+                                     classifier: '',
+                                     file: warFilePath,
+                                     type: 'war']
+                                ]
+                            )
+                        }
+                    }
+                }
 
-            steps {
-                    def warFilePath = "${env.WORKSPACE}/target/vprofile-v2.war"
-                    nexusArtifactUploader(
-                        nexusVersion: 'nexus3',
-                        protocol: 'http',
-                        nexusUrl: "${NEXUSIP}:${NEXUSPORT}",
-                        groupId: 'QA',
-                        version: "${env.BUILD_ID}-${env.BUILD_TIMESTAMP}",
-                        repository: "${RELEASE_REPO}",
-                        credentialsId: "${NEXUS_LOGIN}",
-                        artifacts: [
-                            [artifactId: 'vproapp',
-                             classifier: '',
-                             file: warFilePath,
-                             type: 'war']
-                        ]
-                     )
-            }
-        }
 
     }
 
